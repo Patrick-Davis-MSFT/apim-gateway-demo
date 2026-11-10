@@ -38,6 +38,11 @@ second presenter-controlled email/private browser session.
 6. Send. Expect HTTP 200 and a `properties.forecast` link. Explain that clients
    should route that path back through APIM; returned public links do not
    magically become gateway links. Notebook **M1** demonstrates that routing.
+   The console adds `Cache-Control: no-cache` and `X-Ms-Client-Request-Id`;
+   the global CORS policy must allow these and `Ocp-Apim-Subscription-Key`
+   for the published portal origin. A blocked preflight can appear as
+   `503 Network error occurred`
+   even when the same authenticated request succeeds outside the browser.
 7. In a separate private consumer session choose **Sign up**, supply a distinct
    presenter-controlled address, and submit the account registration.
 8. Complete verification using the email privately if delivered within this

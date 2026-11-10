@@ -62,6 +62,15 @@ class ContractTests(unittest.TestCase):
         self.assertIn("body: { bytes: 0 }", bicep)
         self.assertNotIn("headers: ['Authorization", bicep)
 
+    def test_portal_try_it_cors_allows_default_request_headers(self):
+        cors = ET.parse(ROOT / "policies/global.xml").find("inbound/cors")
+        allowed = {header.text.lower() for header in cors.findall("allowed-headers/header")}
+        self.assertTrue({
+            "cache-control", "ocp-apim-subscription-key", "x-ms-client-request-id",
+        }.issubset(allowed))
+        self.assertEqual(cors.find("allowed-origins/origin").text, "__PORTAL_ORIGIN__")
+        self.assertNotIn("*", allowed)
+
     def test_mcp_bindings_use_exact_imported_operation_ids(self):
         contract = json.loads((ROOT / "api/weather.apim.openapi.json").read_text())
         bicep = (ROOT / "infra/demo.bicep").read_text()
