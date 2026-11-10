@@ -7,36 +7,43 @@ backend APIs with Microsoft Entra ID. It is conceptual, not the configuration
 deployed by this demo: the demo uses subscription keys and does not provision
 OAuth application registrations, token-validation policies, or private backends.
 
+**APIM authorizes API access using Entra-issued access tokens.** Entra ID
+authenticates the caller and issues tokens containing granted permissions; APIM
+is the enforcement point that validates those tokens and checks their permissions
+before allowing a request to reach the backend. This does not require an online
+authorization call to Entra ID for each API request.
+
 ```mermaid
 flowchart TB
-    subgraph RequestPath["API request and response path"]
+    subgraph Consumers["API consumers"]
         direction LR
-        subgraph Consumers["API consumers"]
-            User["User"]
-            App["Interactive application"]
-            Service["Service application"]
-            User --> App
-        end
+        User["User"]
+        App["Interactive application"]
+        Service["Service application"]
+        User --> App
+    end
 
-        subgraph Azure["Azure API platform"]
-            subgraph APIM["Azure API Management"]
-                Gateway["Managed HTTPS gateway"]
-                Policy["Inbound policies: validate-jwt or validate-azure-ad-token; authorize claims; throttle"]
-                Portal["Developer portal - API discovery and test console"]
-                Gateway --> Policy
-            end
-            Backend["Backend APIs"]
-            Monitor["Azure Monitor / Application Insights"]
-            Policy -->|"4. Forward authorized request over HTTPS"| Backend
-            Backend -->|"5. API response via APIM"| Gateway
-            Gateway -.->|"Sanitized telemetry"| Monitor
-            Portal -.->|"Discover APIs and configure test calls"| App
+    subgraph Azure["Azure API platform"]
+        direction LR
+        subgraph APIM["Azure API Management"]
+            Gateway["Managed HTTPS gateway"]
+            Validate["validate-azure-ad-token: verify Entra tenant, signature, audience and lifetime"]
+            Access{"APIM authorization: required delegated scope (scp) or application role (roles)?"}
+            Throttle["Apply rate limits"]
+            Denied["Reject request - no backend access"]
+            Portal["Developer portal - API discovery and test console"]
+            Gateway --> Validate
+            Validate -->|"Valid Entra access token"| Access
+            Validate -->|"Missing or invalid token: 401"| Denied
+            Access -->|"Permission granted"| Throttle
+            Access -->|"Insufficient permissions: 403"| Denied
+            Portal -.->|"Test calls require bearer tokens"| Gateway
         end
-
-        App -->|"2a. HTTPS request with bearer access token"| Gateway
-        Service -->|"2b. HTTPS request with bearer access token"| Gateway
-        Gateway -->|"6a. HTTPS response"| App
-        Gateway -->|"6b. HTTPS response"| Service
+        Backend["Backend APIs"]
+        Monitor["Azure Monitor / Application Insights"]
+        Throttle -->|"4. Forward only authorized requests over HTTPS"| Backend
+        Backend -->|"5. API response via APIM"| Gateway
+        Gateway -.->|"Sanitized telemetry"| Monitor
     end
 
     subgraph Identity["Microsoft Entra ID - OAuth 2.0 authorization server"]
@@ -46,13 +53,10 @@ flowchart TB
         Keys["OpenID Connect metadata and signing keys"]
     end
 
-    RequestPath -->|"1a. Interactive application: sign in and consent with PKCE"| Authorize
-    Authorize -->|"1b. Redirect to interactive application with authorization code"| RequestPath
-    RequestPath -->|"1c. Interactive application: exchange code with PKCE verifier"| Token
-    Token -->|"1d. Delegated access token to interactive application"| RequestPath
-    RequestPath -->|"1e. Service application: client credentials with certificate or secret"| Token
-    Token -->|"1f. App-only access token to service application"| RequestPath
-    RequestPath -.->|"3. APIM: fetch and cache metadata / public signing keys"| Keys
+    Consumers <-->|"2. HTTPS request with bearer access token / 6. HTTPS response"| Azure
+    Azure <-.->|"3. Entra trust: APIM fetches metadata / signing keys, then validates and authorizes locally"| Identity
+    Consumers <-->|"1a-d. Interactive app: sign-in, consent, authorization code + PKCE, delegated token"| Identity
+    Consumers <-->|"1e-f. Service app: client credentials grant, app-only token"| Identity
 ```
 
 - **Delegated access:** the interactive application uses authorization code with
@@ -61,11 +65,21 @@ flowchart TB
 - **App-only access:** a service authenticates directly to the token endpoint
   using client credentials; no user sign-in is involved. Keep credentials out of
   browser applications.
-- **Gateway enforcement:** validate the access token's signature, issuer,
-  audience, and lifetime, then require the appropriate delegated scopes (`scp`)
-  or application roles (`roles`). Invalid tokens are rejected; insufficient
-  permissions are denied before forwarding. APIM validates tokens locally using
-  cached signing keys, not by calling Entra ID for every API request.
+- **Entra configuration:** register the protected API and its clients in Entra
+  ID. Expose delegated scopes for interactive callers and application roles for
+  service callers; configure the corresponding grants, assignments, and consent.
+  Clients request access tokens for this API, not Microsoft Graph or the APIM
+  management API.
+- **Gateway enforcement:** configure `validate-azure-ad-token` in APIM's inbound
+  pipeline for the intended tenant and API audience. Check the required delegated
+  scopes (`scp`) or application roles (`roles`) for the requested operation.
+  `required-claims` can enforce permissions within the validation policy;
+  alternatively, use policy expressions and `choose` / `return-response` after
+  validation for separate authorization decisions. For the diagram's split
+  behavior, return 401 for a missing or invalid token and 403 for a valid token
+  lacking permissions. Claim failures inside the validation policy instead use
+  its configured failure status (401 by default). APIM validates tokens locally
+  using cached signing keys, not by calling Entra ID for every API request.
 - **Backend boundary:** restrict backend ingress to the gateway where possible.
   Configure backend authentication separately, for example APIM managed identity
   or mutual TLS; caller-token forwarding is appropriate only when the backend
@@ -74,6 +88,11 @@ flowchart TB
 - **Portal boundary:** configuring OAuth in the developer portal enables token
   acquisition for its test console; it does not enforce authentication on the
   gateway. Token-validation and authorization policies must be configured.
+
+Microsoft documentation:
+[Protect an API using OAuth 2.0 and Microsoft Entra ID](https://learn.microsoft.com/en-us/azure/api-management/api-management-howto-protect-backend-with-aad)
+and
+[`validate-azure-ad-token` policy reference](https://learn.microsoft.com/en-us/azure/api-management/validate-azure-ad-token-policy).
 
 ## Resource inventory
 
