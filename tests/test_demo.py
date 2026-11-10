@@ -15,6 +15,7 @@ import nbformat
 from nbclient import NotebookClient
 from jsonschema import ValidationError
 import yaml
+from mcp.types import CallToolResult, ListToolsResult, Tool
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -234,18 +235,86 @@ class HelperTests(unittest.TestCase):
             "apis/security-lab/policies/policy",
         ])
 
-    def test_tool_error_is_not_a_success(self):
+    def test_mcp_sdk_discovery_preserves_schema_dictionary_keys(self):
+        tools = [
+            Tool.model_validate({
+                "name": name, "description": name,
+                "inputSchema": {"type": "object", "properties": {"area": {"type": "string"}}},
+            })
+            for name in sorted(helpers.ALLOWED_TOOLS)
+        ]
         session = SimpleNamespace(
-            list_tools=AsyncMock(return_value=SimpleNamespace(tools=[
-                SimpleNamespace(name="weather_point", inputSchema={"type": "object"})
+            list_tools=AsyncMock(return_value=ListToolsResult(tools=tools)),
+        )
+        async def run(action):
+            return await action(session)
+        with patch.object(self.demo, "mcp_session", side_effect=run):
+            discovered = asyncio.run(self.demo.mcp_tools())
+        self.assertEqual({tool["name"] for tool in discovered}, helpers.ALLOWED_TOOLS)
+        self.assertEqual(discovered[0]["inputSchema"], tools[0].input_schema)
+
+    def test_mcp_sdk_successful_call_preserves_wire_result_keys(self):
+        result = CallToolResult.model_validate({
+            "content": [{"type": "text", "text": '{"city":"Washington"}'}],
+            "structuredContent": {"city": "Washington"}, "isError": False,
+        })
+        session = SimpleNamespace(
+            list_tools=AsyncMock(return_value=ListToolsResult(tools=[
+                Tool.model_validate({"name": "weather_point", "inputSchema": {"type": "object"}}),
             ])),
-            call_tool=AsyncMock(return_value=SimpleNamespace(isError=True)),
+            call_tool=AsyncMock(return_value=result),
+        )
+        async def run(action):
+            return await action(session)
+        with patch.object(self.demo, "mcp_session", side_effect=run):
+            actual = asyncio.run(self.demo.mcp_call("weather_point", {}))
+        self.assertEqual(actual["structuredContent"], {"city": "Washington"})
+        self.assertFalse(actual["isError"])
+        session.call_tool.assert_awaited_once_with("weather_point", arguments={})
+
+    def test_mcp_sdk_tool_error_is_not_a_success(self):
+        session = SimpleNamespace(
+            list_tools=AsyncMock(return_value=ListToolsResult(tools=[
+                Tool.model_validate({"name": "weather_point", "inputSchema": {"type": "object"}})
+            ])),
+            call_tool=AsyncMock(return_value=CallToolResult.model_validate({"content": [], "isError": True})),
         )
         async def run(action):
             return await action(session)
         with patch.object(self.demo, "mcp_session", side_effect=run):
             with self.assertRaisesRegex(RuntimeError, "reported an error"):
                 asyncio.run(self.demo.mcp_call("weather_point", {}))
+
+    def test_mcp_sdk_existing_weather_server_cell(self):
+        import ast
+
+        cell = next(c for c in build().cells if "seeded-server-proof" in c.metadata.get("tags", []))
+        for is_error in (False, True):
+            with self.subTest(is_error=is_error):
+                result = CallToolResult.model_validate({"content": [], "isError": is_error})
+                session = SimpleNamespace(
+                    list_tools=AsyncMock(return_value=ListToolsResult(tools=[
+                        Tool.model_validate({"name": name, "inputSchema": {"type": "object"}})
+                        for name in ("weather_forecast", "weather_alerts", "weather_point")
+                    ])),
+                    call_tool=AsyncMock(return_value=result),
+                )
+                async def run(action):
+                    self.assertEqual(self.demo.config["MCP_URL"], CONFIG["MCP_URL"])
+                    return await action(session)
+                namespace = {"demo": self.demo}
+                compiled = compile(cell.source, "<seeded-server-proof>", "exec",
+                                   flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
+                with patch.object(self.demo, "mcp_session", side_effect=run), patch("builtins.print"):
+                    if is_error:
+                        with self.assertRaisesRegex(RuntimeError, "reported an error"):
+                            asyncio.run(eval(compiled, namespace))
+                    else:
+                        asyncio.run(eval(compiled, namespace))
+                session.call_tool.assert_awaited_once_with(
+                    "weather_point", arguments={"latitude": 38.8894, "longitude": -77.0352},
+                )
+                self.assertEqual(self.demo.config["MCP_URL"], CONFIG["MCP_URL"])
 
     def test_assistant_requires_tool_and_bounds_turns(self):
         schema = [{"name": "weather_point", "description": "Point", "inputSchema": {"type": "object"}}]
@@ -272,13 +341,48 @@ class HelperTests(unittest.TestCase):
                 asyncio.run(helpers.assistant(self.demo))
         self.assertEqual(model.chat.completions.create.await_count, 3)
         self.assertEqual(call.await_count, 3)
+        from openai import NOT_GIVEN
+        for request in model.chat.completions.create.await_args_list:
+            self.assertIs(request.kwargs["reasoning_effort"], NOT_GIVEN)
 
     def test_assistant_rejects_non_azure_token_destination(self):
         self.demo.config["AZURE_OPENAI_ENDPOINT"] = "https://not-azure.example"
         with self.assertRaisesRegex(ValueError, "resource-root"):
             asyncio.run(helpers.assistant(self.demo))
 
+    def test_assistant_notebook_displays_and_sends_same_prompt(self):
+        import ast
+
+        cell = next(c for c in build().cells if "assistant-demo" in c.metadata.get("tags", []))
+        assistant = AsyncMock(return_value={
+            "tool_calls": [{"name": "weather_point", "arguments": {}, "result": {}}],
+            "answer": "Nearby city: Washington.",
+        })
+        namespace = {"demo": self.demo, "assistant": assistant, "asyncio": asyncio}
+        compiled = compile(cell.source, "<assistant-demo>", "exec",
+                           flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT)
+        with patch("builtins.print") as output:
+            asyncio.run(eval(compiled, namespace))
+        output.assert_any_call("System prompt:", helpers.ASSISTANT_SYSTEM_PROMPT)
+        output.assert_any_call("User prompt:", helpers.ASSISTANT_USER_PROMPT)
+        assistant.assert_awaited_once_with(self.demo, prompt=helpers.ASSISTANT_USER_PROMPT)
+
+    def test_assistant_default_prompt_uses_city_name_without_coordinates(self):
+        self.assertIn("Washington, DC, USA", helpers.ASSISTANT_USER_PROMPT)
+        self.assertNotRegex(helpers.ASSISTANT_USER_PROMPT, r"\d")
+        self.assertIn("infer approximate city-center coordinates", helpers.ASSISTANT_SYSTEM_PROMPT)
+        self.assertIn("call weather_point", helpers.ASSISTANT_SYSTEM_PROMPT)
+        self.assertIn("Ground weather and forecast-office details in tool results", helpers.ASSISTANT_SYSTEM_PROMPT)
+
+    def test_assistant_rejects_invalid_reasoning_effort_before_network_calls(self):
+        self.demo.config["AZURE_OPENAI_REASONING_EFFORT"] = "invalid"
+        with patch.object(self.demo, "mcp_tools", AsyncMock()) as discover:
+            with self.assertRaisesRegex(ValueError, "AZURE_OPENAI_REASONING_EFFORT"):
+                asyncio.run(helpers.assistant(self.demo))
+        discover.assert_not_awaited()
+
     def test_assistant_success_requires_real_tool_result(self):
+        self.demo.config["AZURE_OPENAI_REASONING_EFFORT"] = "none"
         schemas = [{"name": "weather_point", "description": "Point", "inputSchema": {"type": "object"}}]
         call = SimpleNamespace(
             id="call-1", function=SimpleNamespace(name="weather_point", arguments="{}"),
@@ -307,6 +411,12 @@ class HelperTests(unittest.TestCase):
         self.assertEqual(result["answer"], "Nearby city: Washington.")
         self.assertEqual(result["run_id"], self.demo.run_id)
         self.assertNotIn("secret-not-for-output", json.dumps(result))
+        for request in model.chat.completions.create.await_args_list:
+            self.assertEqual(request.kwargs["reasoning_effort"], "none")
+            self.assertEqual(request.kwargs["messages"][:2], [
+                {"role": "system", "content": helpers.ASSISTANT_SYSTEM_PROMPT},
+                {"role": "user", "content": helpers.ASSISTANT_USER_PROMPT},
+            ])
 
     def test_seed_rerun_preserves_credentials_and_missing_partial_state(self):
         from seed import seed_account

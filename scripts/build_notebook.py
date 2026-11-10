@@ -101,28 +101,24 @@ print("MCP missing-key status:", denial.status_code)
 await demo.mcp_tools()""")
     code("""result = await demo.mcp_call("weather_point", {"latitude": 38.8894, "longitude": -77.0352})
 print(str(result)[:2500])""")
-    markdown("Optional: only after creating the single-tool `presenter-mcp` server in the portal. This uses the same product subscription after you bind that server to `weather-demo`. Otherwise skip the cell; the AI section always uses the seeded server.")
-    code("""original_url = demo.config["MCP_URL"]
-try:
-    demo.config["MCP_URL"] = demo.config["APIM_GATEWAY_URL"].rstrip("/") + "/presenter-mcp/mcp"
-    async def verify_portal_server(session):
-        discovered = (await session.list_tools()).tools
-        if len(discovered) != 1:
-            raise RuntimeError("Create presenter-mcp with only the point operation for this optional check.")
-        print("Portal-created tool:", discovered[0].name, discovered[0].inputSchema)
-        called = await session.call_tool(discovered[0].name, arguments={"latitude": 38.8894, "longitude": -77.0352})
-        if called.isError:
-            raise RuntimeError("Portal-created tool failed; inspect its source operation/policies.")
-        return called.model_dump(mode="json", exclude_none=True)
-    print(str(await demo.mcp_session(verify_portal_server))[:2500])
-finally:
-    demo.config["MCP_URL"] = original_url""", ["optional-portal-server"])
+    markdown("Verify the existing `weather-mcp` server using the configured `MCP_URL`. It exposes three tools; select `weather_point` by name, not by position or tool count. No separate `presenter-mcp` server is required.")
+    code("""discovered = await demo.mcp_tools()
+point_tool = next(tool for tool in discovered if tool["name"] == "weather_point")
+print("Existing server tool:", point_tool["name"], point_tool["inputSchema"])
+result = await demo.mcp_call(point_tool["name"], {"latitude": 38.8894, "longitude": -77.0352})
+print(str(result)[:2500])""", ["seeded-server-proof"])
 
-    entry(6, "Lightweight AI assistant", "Uses the existing tool-capable Azure OpenAI model and your CLI identity. No model or agent is deployed. The assistant must call a real allowed MCP tool; it does not fabricate an answer on failure. The default point-only prompt avoids large alert collections.")
-    code("""answer = await asyncio.wait_for(assistant(demo), timeout=120)
+    entry(6, "Lightweight AI assistant", "Uses the existing tool-capable Azure OpenAI model and your CLI identity. No model or agent is deployed. The default user prompt names Washington, DC, USA; the model infers approximate city-center coordinates for the point tool, not a live geocoding service. The assistant must call a real allowed MCP tool and ground its answer in that result. The point-only prompt avoids large alert collections.")
+    markdown("### Prompts sent to the model\n\nThe next cell prints the exact **system prompt** (tool-use and safety instructions) and **user prompt** (the point lookup request) before calling the model. Both come from the same constants used by the assistant. To try a different request, replace `user_prompt` with your own text.\n\nThe request also includes the names, descriptions, and input schemas discovered from `weather-mcp` as function tools. After a tool call, its real result is added as a `tool` message so the model can produce a grounded answer; there is no separate hidden answer-generation prompt.")
+    code("""from scripts.demo import ASSISTANT_SYSTEM_PROMPT, ASSISTANT_USER_PROMPT
+
+user_prompt = ASSISTANT_USER_PROMPT
+print("System prompt:", ASSISTANT_SYSTEM_PROMPT)
+print("User prompt:", user_prompt)
+answer = await asyncio.wait_for(assistant(demo, prompt=user_prompt), timeout=120)
 print("Tool calls:", [{"name": c["name"], "arguments": c["arguments"]} for c in answer["tool_calls"]])
 print("Real tool result preview:", str(answer["tool_calls"][0]["result"])[:1600])
-print("Grounded answer:", answer["answer"])""")
+print("Grounded answer:", answer["answer"])""", ["assistant-demo"])
     markdown("## Finish\n\nDo not run cleanup on stage. Follow the explicit teardown instructions after the event. Clear all notebook outputs before saving.")
     notebook = nb.v4.new_notebook(cells=cells)
     notebook.metadata["kernelspec"] = {"display_name": "Python 3 (DevContainer)", "language": "python", "name": "python3"}

@@ -106,6 +106,18 @@ path. It is an input to Bicep and a non-secret AZD output; no model is created.
 The notebook uses Azure OpenAI's v1 chat API and requires a deployment supporting
 function calling and `max_completion_tokens`. Validate it before presenting.
 
+If the deployment rejects function tools with its default reasoning effort on
+Chat Completions, explicitly disable reasoning for this notebook:
+
+```sh
+azd env set AZURE_OPENAI_REASONING_EFFORT none
+```
+
+This optional setting is passed on every model turn. Leave it unset for models
+that do not support the parameter; other effort values must be supported by
+your deployment. After changing it, restart the notebook kernel and rerun the
+module setup to reload configuration and Python helpers.
+
 Required permissions:
 
 - Create resources/deployments in the selected subscription and assign APIM's
