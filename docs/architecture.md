@@ -8,46 +8,51 @@ deployed by this demo: the demo uses subscription keys and does not provision
 OAuth application registrations, token-validation policies, or private backends.
 
 ```mermaid
-flowchart LR
-    subgraph Consumers["API consumers"]
-        User["User"]
-        App["Interactive application"]
-        Service["Service application"]
-        User --> App
+flowchart TB
+    subgraph RequestPath["API request and response path"]
+        direction LR
+        subgraph Consumers["API consumers"]
+            User["User"]
+            App["Interactive application"]
+            Service["Service application"]
+            User --> App
+        end
+
+        subgraph Azure["Azure API platform"]
+            subgraph APIM["Azure API Management"]
+                Gateway["Managed HTTPS gateway"]
+                Policy["Inbound policies: validate-jwt or validate-azure-ad-token; authorize claims; throttle"]
+                Portal["Developer portal - API discovery and test console"]
+                Gateway --> Policy
+            end
+            Backend["Backend APIs"]
+            Monitor["Azure Monitor / Application Insights"]
+            Policy -->|"4. Forward authorized request over HTTPS"| Backend
+            Backend -->|"5. API response via APIM"| Gateway
+            Gateway -.->|"Sanitized telemetry"| Monitor
+            Portal -.->|"Discover APIs and configure test calls"| App
+        end
+
+        App -->|"2a. HTTPS request with bearer access token"| Gateway
+        Service -->|"2b. HTTPS request with bearer access token"| Gateway
+        Gateway -->|"6a. HTTPS response"| App
+        Gateway -->|"6b. HTTPS response"| Service
     end
 
     subgraph Identity["Microsoft Entra ID - OAuth 2.0 authorization server"]
+        direction LR
         Authorize["Authorization endpoint"]
         Token["Token endpoint"]
         Keys["OpenID Connect metadata and signing keys"]
-        Authorize -->|"1b. Redirect with authorization code"| App
-        App -->|"1c. Exchange code with PKCE verifier"| Token
-        Token -->|"1d. Delegated access token"| App
-        Token -->|"1f. App-only access token"| Service
     end
 
-    subgraph Azure["Azure API platform"]
-        subgraph APIM["Azure API Management"]
-            Gateway["Managed HTTPS gateway"]
-            Policy["Inbound policies: validate-jwt or validate-azure-ad-token; authorize claims; throttle"]
-            Portal["Developer portal - API discovery and test console"]
-            Gateway --> Policy
-        end
-        Backend["Backend APIs"]
-        Monitor["Azure Monitor / Application Insights"]
-        Policy -->|"4. Forward authorized request over HTTPS"| Backend
-        Backend -->|"5. API response via APIM"| Gateway
-        Gateway -.->|"Sanitized telemetry"| Monitor
-        Portal -.->|"Discover APIs and configure test calls"| App
-    end
-
-    App -->|"1a. Sign in and consent; authorization code + PKCE"| Authorize
-    Service -->|"1e. Client credentials grant with certificate or secret"| Token
-    App -->|"2a. HTTPS request with bearer access token"| Gateway
-    Service -->|"2b. HTTPS request with bearer access token"| Gateway
-    Policy -.->|"3. Fetch and cache metadata / public signing keys"| Keys
-    Gateway -->|"6a. HTTPS response"| App
-    Gateway -->|"6b. HTTPS response"| Service
+    RequestPath -->|"1a. Interactive application: sign in and consent with PKCE"| Authorize
+    Authorize -->|"1b. Redirect to interactive application with authorization code"| RequestPath
+    RequestPath -->|"1c. Interactive application: exchange code with PKCE verifier"| Token
+    Token -->|"1d. Delegated access token to interactive application"| RequestPath
+    RequestPath -->|"1e. Service application: client credentials with certificate or secret"| Token
+    Token -->|"1f. App-only access token to service application"| RequestPath
+    RequestPath -.->|"3. APIM: fetch and cache metadata / public signing keys"| Keys
 ```
 
 - **Delegated access:** the interactive application uses authorization code with
