@@ -1,0 +1,9 @@
+<policies>
+  <inbound>
+    <base />
+    <include-fragment fragment-id="weather-backend" />
+  </inbound>
+  <backend><base /></backend>
+  <outbound><base /></outbound>
+  <on-error><base /></on-error>
+</policies>

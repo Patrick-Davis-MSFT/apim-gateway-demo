@@ -1,0 +1,14 @@
+.azure/*
+!.azure/deployment-plan.md
+.venv/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+*.pyc
+*.bicep.json
+.env
+.env.*
+!.env.example
+notebooks/*-executed.ipynb
+artifacts/
+.specify/cache/

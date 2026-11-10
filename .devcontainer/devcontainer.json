@@ -1,0 +1,27 @@
+{
+  "name": "APIM weather walkthrough (CFS)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "root",
+  "containerEnv": {
+    "APIM_DEMO_CONTAINER": "1"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-bicep",
+        "ms-azuretools.azure-dev",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "jupyter.askForKernelRestart": false
+      }
+    }
+  },
+  "postCreateCommand": "python scripts/preflight.py --local"
+}

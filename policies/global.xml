@@ -1,0 +1,13 @@
+<policies>
+  <inbound>
+    <cors allow-credentials="false">
+      <allowed-origins><origin>__PORTAL_ORIGIN__</origin></allowed-origins>
+      <allowed-methods><method>GET</method><method>POST</method><method>OPTIONS</method></allowed-methods>
+      <allowed-headers><header>Content-Type</header><header>Accept</header><header>Ocp-Apim-Subscription-Key</header><header>X-Demo-Intent</header><header>X-Demo-Run-Id</header></allowed-headers>
+      <expose-headers><header>X-Demo-Policy</header><header>Retry-After</header></expose-headers>
+    </cors>
+  </inbound>
+  <backend><forward-request /></backend>
+  <outbound />
+  <on-error />
+</policies>

@@ -1,0 +1,6 @@
+<fragment>
+  <check-header name="X-Demo-Intent" failed-check-httpcode="400" failed-check-error-message="X-Demo-Intent must be learning." ignore-case="false">
+    <value>learning</value>
+  </check-header>
+  <rate-limit-by-key calls="5" renewal-period="10" counter-key="@(&quot;security-lab-&quot; + context.Subscription.Id)" />
+</fragment>

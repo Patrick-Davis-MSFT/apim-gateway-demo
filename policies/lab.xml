@@ -1,0 +1,10 @@
+<policies>
+  <inbound>
+    <base />
+    <include-fragment fragment-id="lab-protection" />
+    <include-fragment fragment-id="lab-response" />
+  </inbound>
+  <backend><base /></backend>
+  <outbound><base /></outbound>
+  <on-error><base /></on-error>
+</policies>

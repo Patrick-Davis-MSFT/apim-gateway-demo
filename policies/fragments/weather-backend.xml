@@ -1,0 +1,7 @@
+<fragment>
+  <set-backend-service base-url="https://api.weather.gov" />
+  <set-header name="User-Agent" exists-action="override"><value>{{weather-user-agent}}</value></set-header>
+  <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+  <set-header name="Authorization" exists-action="delete" />
+  <set-query-parameter name="subscription-key" exists-action="delete" />
+</fragment>

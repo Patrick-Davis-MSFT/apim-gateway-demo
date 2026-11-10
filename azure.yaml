@@ -1,0 +1,13 @@
+name: apim-weather-walkthrough
+infra:
+  provider: bicep
+  path: infra
+hooks:
+  preprovision:
+    shell: sh
+    run: python scripts/preflight.py --configuration --interactive
+    interactive: true
+  postprovision:
+    shell: sh
+    run: python scripts/seed.py
+    interactive: true

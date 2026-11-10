@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": { "value": "${AZURE_ENV_NAME}" },
+    "location": { "value": "${AZURE_LOCATION}" },
+    "publisherEmail": { "value": "${PUBLISHER_EMAIL}" },
+    "weatherContact": { "value": "${WEATHER_CONTACT}" },
+    "developerEmail": { "value": "${DEMO_DEVELOPER_EMAIL}" },
+    "modelEndpoint": { "value": "${AZURE_OPENAI_ENDPOINT}" },
+    "modelDeployment": { "value": "${AZURE_OPENAI_DEPLOYMENT}" }
+  }
+}

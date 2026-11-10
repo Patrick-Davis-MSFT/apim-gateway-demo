@@ -1,0 +1,8 @@
+<fragment>
+  <return-response>
+    <set-status code="200" reason="OK" />
+    <set-header name="Content-Type" exists-action="override"><value>application/json</value></set-header>
+    <set-header name="X-Demo-Policy" exists-action="override"><value>baseline</value></set-header>
+    <set-body>{"synthetic":true,"message":"Learning probe. No request was sent to Weather.gov."}</set-body>
+  </return-response>
+</fragment>

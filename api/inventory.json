@@ -1,0 +1,813 @@
+{
+  "source": "https://api.weather.gov/openapi.json",
+  "openapi": "3.1.2",
+  "sha256": "4909f4d47c493246ef4cb4e97dbc89fe699e11c326483fa755d26c64a676e13c",
+  "importOpenapi": "3.0.3",
+  "importSha256": "d2b16caedbbd5a1b92bfd9de15b7bbe0547cfe95ae274ea392b4fd7fd001e3ef",
+  "compatibilityChanges": [
+    {
+      "path": "#/openapi",
+      "from": "3.1.2",
+      "to": "3.0.3"
+    },
+    {
+      "path": "#/components/schemas/Alert/properties/onset/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Alert/properties/ends/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Alert/properties/headline/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Alert/properties/instruction/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Alert/properties/note/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/GeometryString/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/GeoJsonGeometry/oneOf/6/type",
+      "from": "null",
+      "to": "string",
+      "nullable": true,
+      "enum": [
+        null
+      ]
+    },
+    {
+      "path": "#/components/schemas/Gridpoint/properties/weather/properties/values/items/properties/value/items/properties/coverage/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Gridpoint/properties/weather/properties/values/items/properties/value/items/properties/weather/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Gridpoint/properties/weather/properties/values/items/properties/value/items/properties/intensity/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Gridpoint/properties/hazards/properties/values/items/properties/value/items/properties/event_number/type",
+      "from": [
+        "integer",
+        "null"
+      ],
+      "to": "integer",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/GridpointQuantitativeValueLayer/properties/values/items/properties/value/type",
+      "from": [
+        "number",
+        "null"
+      ],
+      "to": "number",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/GridpointHourlyForecastPeriod/properties/name/examples",
+      "from": [
+        "Tuesday Night"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/GridpointHourlyForecastPeriod/properties/temperatureTrend/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/GridpointHourlyForecastPeriod/properties/windGust/oneOf/2/type",
+      "from": "null",
+      "to": "string",
+      "nullable": true,
+      "enum": [
+        null
+      ]
+    },
+    {
+      "path": "#/components/schemas/Gridpoint12hForecastPeriod/properties/name/examples",
+      "from": [
+        "Tuesday Night"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/Gridpoint12hForecastPeriod/properties/temperatureTrend/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Gridpoint12hForecastPeriod/properties/windGust/oneOf/2/type",
+      "from": "null",
+      "to": "string",
+      "nullable": true,
+      "enum": [
+        null
+      ]
+    },
+    {
+      "path": "#/components/schemas/ISO8601Duration/examples",
+      "from": [
+        "P2DT12H"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ISO8601Interval/oneOf/0/examples",
+      "from": [
+        "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ISO8601Interval/oneOf/1/examples",
+      "from": [
+        "2007-03-01T13:00:00Z/P1Y2M10DT2H30M"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ISO8601Interval/oneOf/2/examples",
+      "from": [
+        "P1Y2M10DT2H30M/2008-05-11T15:30:00Z"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/MetarPhenomenon/properties/intensity/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/MetarPhenomenon/properties/modifier/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Observation/properties/icon/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Observation/properties/cloudLayers/type",
+      "from": [
+        "array",
+        "null"
+      ],
+      "to": "array",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/OfficeHeadline/properties/summary/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Point/properties/nwr/properties/transmitter/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Point/properties/nwr/properties/areaBroadcast/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Point/properties/nwr/properties/pointBroadcast/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/type/examples",
+      "from": [
+        "urn:noaa:nws:api:UnexpectedProblem"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/title/examples",
+      "from": [
+        "Unexpected Problem"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/status/examples",
+      "from": [
+        500
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/detail/examples",
+      "from": [
+        "An unexpected problem has occurred."
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/instance/examples",
+      "from": [
+        "urn:noaa:nws:api:request:493c3a1d-f87e-407f-ae2c-24483f5aab63"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/ProblemDetail/properties/correlationId/examples",
+      "from": [
+        "493c3a1d-f87e-407f-ae2c-24483f5aab63"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    },
+    {
+      "path": "#/components/schemas/QuantitativeValue/properties/value/type",
+      "from": [
+        "number",
+        "null"
+      ],
+      "to": "number",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Sigmet/properties/fir/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Sigmet/properties/sequence/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Sigmet/properties/phenomenon/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/TextProductLocationCollection/properties/locations/additionalProperties/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/Zone/properties/state/oneOf/2/type",
+      "from": "null",
+      "to": "string",
+      "nullable": true,
+      "enum": [
+        null
+      ]
+    },
+    {
+      "path": "#/components/schemas/Zone/properties/radarStation/type",
+      "from": [
+        "string",
+        "null"
+      ],
+      "to": "string",
+      "nullable": true
+    },
+    {
+      "path": "#/components/schemas/ZoneForecast/properties/periods/items/properties/name/examples",
+      "from": [
+        "This Afternoon"
+      ],
+      "to": "example",
+      "preservedAs": "x-original-examples"
+    }
+  ],
+  "operations": [
+    {
+      "path": "/alerts",
+      "method": "get",
+      "sourceOperationId": "alerts_query",
+      "apimOperationId": "alerts_query"
+    },
+    {
+      "path": "/alerts/active",
+      "method": "get",
+      "sourceOperationId": "alerts_active",
+      "apimOperationId": "alerts_active"
+    },
+    {
+      "path": "/alerts/active/area/{area}",
+      "method": "get",
+      "sourceOperationId": "alerts_active_area",
+      "apimOperationId": "alerts_active_area"
+    },
+    {
+      "path": "/alerts/active/count",
+      "method": "get",
+      "sourceOperationId": "alerts_active_count",
+      "apimOperationId": "alerts_active_count"
+    },
+    {
+      "path": "/alerts/active/region/{region}",
+      "method": "get",
+      "sourceOperationId": "alerts_active_region",
+      "apimOperationId": "alerts_active_region"
+    },
+    {
+      "path": "/alerts/active/zone/{zoneId}",
+      "method": "get",
+      "sourceOperationId": "alerts_active_zone",
+      "apimOperationId": "alerts_active_zone"
+    },
+    {
+      "path": "/alerts/types",
+      "method": "get",
+      "sourceOperationId": "alerts_types",
+      "apimOperationId": "alerts_types"
+    },
+    {
+      "path": "/alerts/{id}",
+      "method": "get",
+      "sourceOperationId": "alerts_single",
+      "apimOperationId": "alerts_single"
+    },
+    {
+      "path": "/aviation/cwsus/{cwsuId}",
+      "method": "get",
+      "sourceOperationId": "cwsu",
+      "apimOperationId": "cwsu"
+    },
+    {
+      "path": "/aviation/cwsus/{cwsuId}/cwas",
+      "method": "get",
+      "sourceOperationId": "cwas",
+      "apimOperationId": "cwas"
+    },
+    {
+      "path": "/aviation/cwsus/{cwsuId}/cwas/{date}/{sequence}",
+      "method": "get",
+      "sourceOperationId": "cwa",
+      "apimOperationId": "cwa"
+    },
+    {
+      "path": "/aviation/sigmets",
+      "method": "get",
+      "sourceOperationId": "sigmetQuery",
+      "apimOperationId": "sigmetQuery"
+    },
+    {
+      "path": "/aviation/sigmets/{atsu}",
+      "method": "get",
+      "sourceOperationId": "sigmetsByATSU",
+      "apimOperationId": "sigmetsByATSU"
+    },
+    {
+      "path": "/aviation/sigmets/{atsu}/{date}",
+      "method": "get",
+      "sourceOperationId": "sigmetsByATSUByDate",
+      "apimOperationId": "sigmetsByATSUByDate"
+    },
+    {
+      "path": "/aviation/sigmets/{atsu}/{date}/{time}",
+      "method": "get",
+      "sourceOperationId": "sigmet",
+      "apimOperationId": "sigmet"
+    },
+    {
+      "path": "/glossary",
+      "method": "get",
+      "sourceOperationId": "glossary",
+      "apimOperationId": "glossary"
+    },
+    {
+      "path": "/gridpoints/{wfo}/{x},{y}",
+      "method": "get",
+      "sourceOperationId": "gridpoint",
+      "apimOperationId": "gridpoint"
+    },
+    {
+      "path": "/gridpoints/{wfo}/{x},{y}/forecast",
+      "method": "get",
+      "sourceOperationId": "gridpoint_forecast",
+      "apimOperationId": "gridpoint_forecast"
+    },
+    {
+      "path": "/gridpoints/{wfo}/{x},{y}/forecast/hourly",
+      "method": "get",
+      "sourceOperationId": "gridpoint_forecast_hourly",
+      "apimOperationId": "gridpoint_forecast_hourly"
+    },
+    {
+      "path": "/gridpoints/{wfo}/{x},{y}/stations",
+      "method": "get",
+      "sourceOperationId": "gridpoint_stations",
+      "apimOperationId": "gridpoint_stations"
+    },
+    {
+      "path": "/icons",
+      "method": "get",
+      "sourceOperationId": "icons_summary",
+      "apimOperationId": "icons_summary"
+    },
+    {
+      "path": "/icons/{set}/{timeOfDay}/{first}",
+      "method": "get",
+      "sourceOperationId": "icons",
+      "apimOperationId": "icons"
+    },
+    {
+      "path": "/icons/{set}/{timeOfDay}/{first}/{second}",
+      "method": "get",
+      "sourceOperationId": "iconsDualCondition",
+      "apimOperationId": "iconsDualCondition"
+    },
+    {
+      "path": "/offices/{officeId}",
+      "method": "get",
+      "sourceOperationId": "office",
+      "apimOperationId": "office"
+    },
+    {
+      "path": "/offices/{officeId}/briefing",
+      "method": "get",
+      "sourceOperationId": "office_briefing",
+      "apimOperationId": "office_briefing"
+    },
+    {
+      "path": "/offices/{officeId}/briefing/download/latest",
+      "method": "get",
+      "sourceOperationId": "office_briefing_download_latest",
+      "apimOperationId": "office_briefing_download_latest"
+    },
+    {
+      "path": "/offices/{officeId}/briefing/download/{briefingId}",
+      "method": "get",
+      "sourceOperationId": "office_briefing_download",
+      "apimOperationId": "office_briefing_download"
+    },
+    {
+      "path": "/offices/{officeId}/headlines",
+      "method": "get",
+      "sourceOperationId": "office_headlines",
+      "apimOperationId": "office_headlines"
+    },
+    {
+      "path": "/offices/{officeId}/headlines/{headlineId}",
+      "method": "get",
+      "sourceOperationId": "office_headline",
+      "apimOperationId": "office_headline"
+    },
+    {
+      "path": "/offices/{officeId}/weatherstories",
+      "method": "get",
+      "sourceOperationId": "office_weatherstory",
+      "apimOperationId": "office_weatherstory"
+    },
+    {
+      "path": "/offices/{officeId}/weatherstories/download/{imageId}",
+      "method": "get",
+      "sourceOperationId": "office_weatherstory_image",
+      "apimOperationId": "office_weatherstory_image"
+    },
+    {
+      "path": "/points/{latitude},{longitude}",
+      "method": "get",
+      "sourceOperationId": "point",
+      "apimOperationId": "point"
+    },
+    {
+      "path": "/points/{latitude},{longitude}/radio",
+      "method": "get",
+      "sourceOperationId": "point_radio",
+      "apimOperationId": "point_radio"
+    },
+    {
+      "path": "/points/{latitude},{longitude}/stations",
+      "method": "get",
+      "sourceOperationId": "point_stations",
+      "apimOperationId": "point_stations"
+    },
+    {
+      "path": "/products",
+      "method": "get",
+      "sourceOperationId": "products_query",
+      "apimOperationId": "products_query"
+    },
+    {
+      "path": "/products/locations",
+      "method": "get",
+      "sourceOperationId": "product_locations",
+      "apimOperationId": "product_locations"
+    },
+    {
+      "path": "/products/locations/{locationId}/types",
+      "method": "get",
+      "sourceOperationId": "location_products",
+      "apimOperationId": "location_products"
+    },
+    {
+      "path": "/products/types",
+      "method": "get",
+      "sourceOperationId": "product_types",
+      "apimOperationId": "product_types"
+    },
+    {
+      "path": "/products/types/{typeId}",
+      "method": "get",
+      "sourceOperationId": "products_type",
+      "apimOperationId": "products_type"
+    },
+    {
+      "path": "/products/types/{typeId}/locations",
+      "method": "get",
+      "sourceOperationId": "products_type_locations",
+      "apimOperationId": "products_type_locations"
+    },
+    {
+      "path": "/products/types/{typeId}/locations/{locationId}",
+      "method": "get",
+      "sourceOperationId": "products_type_location",
+      "apimOperationId": "products_type_location"
+    },
+    {
+      "path": "/products/types/{typeId}/locations/{locationId}/latest",
+      "method": "get",
+      "sourceOperationId": "latest_product_type_location",
+      "apimOperationId": "latest_product_type_location"
+    },
+    {
+      "path": "/products/{productId}",
+      "method": "get",
+      "sourceOperationId": "product",
+      "apimOperationId": "product"
+    },
+    {
+      "path": "/radar/profilers/{stationId}",
+      "method": "get",
+      "sourceOperationId": "radar_profiler",
+      "apimOperationId": "radar_profiler"
+    },
+    {
+      "path": "/radar/queues/{host}",
+      "method": "get",
+      "sourceOperationId": "radar_queue",
+      "apimOperationId": "radar_queue"
+    },
+    {
+      "path": "/radar/servers",
+      "method": "get",
+      "sourceOperationId": "radar_servers",
+      "apimOperationId": "radar_servers"
+    },
+    {
+      "path": "/radar/servers/{id}",
+      "method": "get",
+      "sourceOperationId": "radar_server",
+      "apimOperationId": "radar_server"
+    },
+    {
+      "path": "/radar/spgds",
+      "method": "get",
+      "sourceOperationId": "radar_spgds",
+      "apimOperationId": "radar_spgds"
+    },
+    {
+      "path": "/radar/stations",
+      "method": "get",
+      "sourceOperationId": "radar_stations",
+      "apimOperationId": "radar_stations"
+    },
+    {
+      "path": "/radar/stations/{stationId}",
+      "method": "get",
+      "sourceOperationId": "radar_station",
+      "apimOperationId": "radar_station"
+    },
+    {
+      "path": "/radar/stations/{stationId}/alarms",
+      "method": "get",
+      "sourceOperationId": "radar_station_alarms",
+      "apimOperationId": "radar_station_alarms"
+    },
+    {
+      "path": "/radio",
+      "method": "get",
+      "sourceOperationId": "transmitters",
+      "apimOperationId": "transmitters"
+    },
+    {
+      "path": "/radio/{callSign}",
+      "method": "get",
+      "sourceOperationId": "transmitter",
+      "apimOperationId": "transmitter"
+    },
+    {
+      "path": "/radio/{callSign}/broadcast",
+      "method": "get",
+      "sourceOperationId": "area_radio",
+      "apimOperationId": "area_radio"
+    },
+    {
+      "path": "/stations",
+      "method": "get",
+      "sourceOperationId": "obs_stations",
+      "apimOperationId": "obs_stations"
+    },
+    {
+      "path": "/stations/{stationId}",
+      "method": "get",
+      "sourceOperationId": "obs_station",
+      "apimOperationId": "obs_station"
+    },
+    {
+      "path": "/stations/{stationId}/observations",
+      "method": "get",
+      "sourceOperationId": "station_observation_list",
+      "apimOperationId": "station_observation_list"
+    },
+    {
+      "path": "/stations/{stationId}/observations/latest",
+      "method": "get",
+      "sourceOperationId": "station_observation_latest",
+      "apimOperationId": "station_observation_latest"
+    },
+    {
+      "path": "/stations/{stationId}/observations/{time}",
+      "method": "get",
+      "sourceOperationId": "station_observation_time",
+      "apimOperationId": "station_observation_time"
+    },
+    {
+      "path": "/stations/{stationId}/tafs",
+      "method": "get",
+      "sourceOperationId": "tafs",
+      "apimOperationId": "tafs"
+    },
+    {
+      "path": "/stations/{stationId}/tafs/{date}/{time}",
+      "method": "get",
+      "sourceOperationId": "taf",
+      "apimOperationId": "taf"
+    },
+    {
+      "path": "/thumbnails/satellite/{area}",
+      "method": "get",
+      "sourceOperationId": "satellite_thumbnails",
+      "apimOperationId": "satellite_thumbnails"
+    },
+    {
+      "path": "/zones",
+      "method": "get",
+      "sourceOperationId": "zone_list",
+      "apimOperationId": "zone_list"
+    },
+    {
+      "path": "/zones/forecast/{zoneId}/observations",
+      "method": "get",
+      "sourceOperationId": "zone_obs",
+      "apimOperationId": "zone_obs"
+    },
+    {
+      "path": "/zones/forecast/{zoneId}/stations",
+      "method": "get",
+      "sourceOperationId": "zone_stations",
+      "apimOperationId": "zone_stations"
+    },
+    {
+      "path": "/zones/{type}",
+      "method": "get",
+      "sourceOperationId": "zone_list_type",
+      "apimOperationId": "zone_list_type"
+    },
+    {
+      "path": "/zones/{type}/{zoneId}",
+      "method": "get",
+      "sourceOperationId": "zone",
+      "apimOperationId": "zone"
+    },
+    {
+      "path": "/zones/{type}/{zoneId}/forecast",
+      "method": "get",
+      "sourceOperationId": "zone_forecast",
+      "apimOperationId": "zone_forecast"
+    },
+    {
+      "path": "/zones/{type}/{zoneId}/radio",
+      "method": "get",
+      "sourceOperationId": "transmitter_zone",
+      "apimOperationId": "transmitter_zone"
+    }
+  ]
+}

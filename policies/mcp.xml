@@ -1,0 +1,9 @@
+<policies>
+  <inbound>
+    <base />
+    <rate-limit-by-key calls="30" renewal-period="60" counter-key="@(&quot;weather-mcp-&quot; + context.Subscription.Id)" />
+  </inbound>
+  <backend><base /></backend>
+  <outbound><base /></outbound>
+  <on-error><base /></on-error>
+</policies>
